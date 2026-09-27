@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Iceberg AI Solutions — AI Receptionist for Service Businesses</title>
+<style>
+:root{
+  --bg:#0A0A10; --bg-2:#14141F; --ink:#F1EEE7; --ink-soft:#A39DB0;
+  --panel:rgba(255,255,255,.045); --panel-solid:#15151F; --line:rgba(255,255,255,.10);
+  --gold:#D9BE8F; --gold-soft:#E9DCC2; --violet:#8E7CF0; --violet-deep:#6455C9; --rose:#E7A3A3;
+  --radius:20px;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;line-height:1.6;
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(142,124,240,.22), transparent 60%),
+    radial-gradient(700px 500px at -10% 20%, rgba(217,190,143,.14), transparent 55%),
+    linear-gradient(180deg,var(--bg),var(--bg-2));
+  background-attachment:fixed;min-height:100vh;
+}
+h1,h2,h3{font-family:"Optima","Georgia","Times New Roman",serif;font-weight:500;margin:0 0 .3em;letter-spacing:.01em}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer}
+.btn{border:none;border-radius:999px;padding:.75em 1.5em;font-size:.95rem;font-weight:600;transition:transform .15s,box-shadow .15s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--gold),#C9A96A);color:#171208;box-shadow:0 6px 24px rgba(217,190,143,.25)}
+.btn-primary:hover{box-shadow:0 8px 30px rgba(217,190,143,.4);transform:translateY(-1px)}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--gold-soft);border:1px solid var(--line);backdrop-filter:blur(8px)}
+.btn-ghost:hover{border-color:var(--gold)}
+.btn-sm{padding:.45em 1.1em;font-size:.82rem}
+input,select,textarea{font-family:inherit;font-size:.95rem;padding:.7em .85em;border:1px solid var(--line);border-radius:12px;width:100%;background:rgba(255,255,255,.04);color:var(--ink);backdrop-filter:blur(6px)}
+input::placeholder{color:#6E6980}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(142,124,240,.22)}
+select option{background:#171722;color:var(--ink)}
+label{font-size:.78rem;color:var(--ink-soft);display:block;margin:.8em 0 .3em;font-weight:600;letter-spacing:.02em}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.hide{display:none !important}
+/* Nav */
+.topbar{border-bottom:1px solid var(--line);background:rgba(10,10,16,.55);backdrop-filter:blur(18px);position:sticky;top:0;z-index:10}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;padding:16px 24px}
+.brand{font-family:"Optima",Georgia,serif;font-size:1.35rem;font-weight:500;letter-spacing:.02em;font-style:italic}
+.brand span{background:linear-gradient(120deg,var(--gold),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;font-style:normal}
+/* Landing */
+.hero{padding:110px 0 80px;text-align:left;position:relative}
+.hero h1{font-size:3.1rem;max-width:13ch;line-height:1.12;background:linear-gradient(120deg,#fff 40%,var(--gold-soft) 75%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:54ch;color:var(--ink-soft);font-size:1.12rem}
+.hero-actions{display:flex;gap:14px;margin-top:30px}
+.biz-picker{display:flex;gap:16px;flex-wrap:wrap;margin-top:40px}
+.biz-chip{border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:20px 22px;cursor:pointer;min-width:230px;backdrop-filter:blur(14px);transition:border-color .2s,transform .2s}
+.biz-chip:hover{border-color:var(--gold);transform:translateY(-3px)}
+.biz-chip .cat{font-size:.72rem;color:var(--violet);font-weight:700;letter-spacing:.06em}
+/* Dashboard layout */
+.dash{display:flex;min-height:100vh}
+.sidebar{width:232px;background:rgba(12,12,18,.6);backdrop-filter:blur(20px);border-right:1px solid var(--line);color:#fff;padding:24px 16px;flex-shrink:0}
+.sidebar .brand{color:#fff;margin-bottom:26px;display:block}
+.side-link{display:block;padding:.65em .9em;border-radius:12px;color:#C9C4D6;text-decoration:none;font-size:.9rem;margin-bottom:3px;background:none;border:none;width:100%;text-align:left;transition:background .15s}
+.side-link:hover{background:rgba(255,255,255,.06)}
+.side-link.active{background:linear-gradient(135deg,rgba(142,124,240,.35),rgba(217,190,143,.25));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.main{flex:1;padding:32px 36px;max-width:900px}
+.pagehead{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.pagehead p{color:var(--ink-soft);margin:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.list-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.list-row:last-child{border-bottom:none}
+.badge{font-size:.7rem;font-weight:700;padding:.3em .75em;border-radius:999px;letter-spacing:.02em}
+.badge-open{background:rgba(142,124,240,.18);color:#C7BFFA}
+.badge-pending{background:rgba(217,190,143,.2);color:var(--gold-soft)}
+.badge-confirmed{background:rgba(142,124,240,.18);color:#C7BFFA}
+.badge-transferred{background:rgba(231,163,163,.18);color:var(--rose)}
+.small{font-size:.82rem;color:var(--ink-soft)}
+.svc-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.svc-row:last-child{border-bottom:none}
+.hours-row{display:grid;grid-template-columns:100px 1fr auto;gap:10px;align-items:center;padding:7px 0}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:rgba(20,20,30,.9);border:1px solid var(--line);backdrop-filter:blur(14px);color:#fff;padding:13px 22px;border-radius:999px;font-size:.9rem;box-shadow:0 12px 32px rgba(0,0,0,.4);z-index:50}
+/* Chat */
+.chat-wrap{max-width:580px;margin:0 auto;padding:28px 24px}
+.chat-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.chat-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--gold));color:#14101f;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 0 22px rgba(142,124,240,.5)}
+.chat-box{background:var(--panel);border:1px solid var(--line);border-radius:24px;height:60vh;min-height:400px;display:flex;flex-direction:column;backdrop-filter:blur(18px);box-shadow:0 24px 70px rgba(0,0,0,.4);overflow:hidden}
+.chat-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:80%;padding:.7em 1em;border-radius:16px;font-size:.92rem;line-height:1.5}
+.msg.ai{background:rgba(255,255,255,.05);align-self:flex-start;border:1px solid var(--line)}
+.msg.user{background:linear-gradient(135deg,var(--violet),var(--violet-deep));color:#fff;align-self:flex-end;border-radius:16px 16px 4px 16px}
+.chat-input{display:flex;gap:10px;padding:14px;border-top:1px solid var(--line)}
+.slots{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.slot-btn{border:1px solid var(--gold);color:var(--gold-soft);background:rgba(217,190,143,.08);border-radius:999px;padding:.45em .9em;font-size:.85rem;transition:background .15s}
+.slot-btn:hover{background:var(--gold);color:#171208}
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(6,6,10,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal{background:var(--panel-solid);border:1px solid var(--line);border-radius:22px;padding:28px;max-width:440px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.modal .row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+@media(max-width:720px){.dash{flex-direction:column}.sidebar{width:100%;display:flex;overflow-x:auto;gap:4px}.sidebar .brand{display:none}.main{padding:22px}.grid2{grid-template-columns:1fr}.hero h1{font-size:2.1rem}}
+/* Motion */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.view-in,.msg,.pop,.stat-card,.card,.biz-chip{animation:none !important}}
+.view-in{animation:fadeUp 1.4s cubic-bezier(.16,1,.3,1) both}
+.msg{animation:fadeUp 1.05s cubic-bezier(.16,1,.3,1) both}
+.pop{animation:popIn .9s cubic-bezier(.16,1,.3,1) both}
+.card{animation:fadeUp 1.25s cubic-bezier(.16,1,.3,1) both}
+.biz-chip{animation:popIn 1s cubic-bezier(.16,1,.3,1) both}
+.biz-chip:nth-child(2){animation-delay:.15s}
+.biz-chip:nth-child(3){animation-delay:.3s}
+.stat-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px 20px;backdrop-filter:blur(14px);animation:popIn 1s cubic-bezier(.16,1,.3,1) both}
+.stat-card:nth-child(2){animation-delay:.15s}
+.stat-card:nth-child(3){animation-delay:.3s}
+.stat-num{font-family:"Optima",Georgia,serif;font-size:2rem;background:linear-gradient(120deg,var(--gold-soft),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.quick-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.qa-btn{border:none;border-radius:999px;padding:.5em 1.1em;font-size:.85rem;font-weight:600;animation:popIn .8s cubic-bezier(.16,1,.3,1) both}
+.qa-confirm{background:linear-gradient(135deg,var(--gold),#C9A96A);color:#171208}
+.qa-human{background:rgba(255,255,255,.06);color:var(--ink);border:1px solid var(--line)}
+.avatar-tag{margin-right:6px}
+/* Intro: two doors that ease open to reveal the site, like stepping through an entrance */
+#intro{position:fixed;inset:0;z-index:200;overflow:hidden}
+#intro.intro-hide{visibility:hidden;transition:visibility 0s 2s}
+.door{position:absolute;top:0;bottom:0;width:50%;background:
+    radial-gradient(600px 500px at 50% 50%,rgba(142,124,240,.14),transparent 65%),
+    linear-gradient(180deg,var(--bg),var(--bg-2));
+  transition:transform 2.1s cubic-bezier(.65,0,.35,1)}
+.door-left{left:0;border-right:1px solid rgba(255,255,255,.08)}
+.door-right{right:0;border-left:1px solid rgba(255,255,255,.08)}
+#intro.doors-open .door-left{transform:translateX(-100%)}
+#intro.doors-open .door-right{transform:translateX(100%)}
+.intro-mark-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;
+  transition:opacity 1.2s ease;z-index:2}
+#intro.doors-open .intro-mark-wrap{opacity:0}
+.intro-mark{font-family:"Optima",Georgia,serif;font-style:italic;font-size:2.3rem;letter-spacing:.02em;color:#fff;text-align:center;
+  animation:introIn 2s cubic-bezier(.16,1,.3,1) both}
+.intro-mark span{background:linear-gradient(120deg,var(--gold),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;font-style:normal}
+.intro-line{width:64px;height:1px;margin:18px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  animation:introLine 2s cubic-bezier(.16,1,.3,1) both .4s}
+@keyframes introIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes introLine{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
+</style>
+</head>
+<body>
+<div id="intro">
+  <div class="door door-left"></div>
+  <div class="door door-right"></div>
+  <div class="intro-mark-wrap">
+    <div class="intro-mark">Iceberg <span>AI Solutions</span></div>
+    <div class="intro-line"></div>
+  </div>
+</div>
+<div id="app"></div>
+
+<script>
+/* ---------- DATA LAYER (simulated DB) ---------- */
+let DB = {
+  businesses: {
+    salon_001: {
+      id:"salon_001", name:"Glow Hair Salon", category:"Hair Salon",
+      phone:"+60 3-1234 5678", address:"12 Jalan Ampang, Kuala Lumpur",
+      hours:{Mon:"9:00 AM–7:00 PM",Tue:"9:00 AM–7:00 PM",Wed:"9:00 AM–7:00 PM",Thu:"9:00 AM–7:00 PM",Fri:"9:00 AM–8:00 PM",Sat:"9:00 AM–8:00 PM",Sun:"Closed"},
+      services:[
+        {id:"s1",name:"Haircut",price:40,duration:45},
+        {id:"s2",name:"Hair Colour",price:120,duration:120},
+        {id:"s3",name:"Hair Wash",price:20,duration:20}
+      ],
+      staff:[{id:"st1",name:"Mei Ling"},{id:"st2",name:"Aisyah"}],
+      ai:{name:"Luna",personality:"Warm and efficient",languages:"English, Malay"},
+      bookings:[
+        {id:"b1",customer:"Chong Wei",service:"Haircut",time:"Tomorrow 10:00 AM",status:"confirmed"}
+      ],
+      enquiries:[]
+    },
+    spa_002: {
+      id:"spa_002", name:"Elite Beauty Spa", category:"Spa & Wellness",
+      phone:"+60 3-9876 5432", address:"88 Jalan Bukit Bintang, Kuala Lumpur",
+      hours:{Mon:"10:00 AM–8:00 PM",Tue:"10:00 AM–8:00 PM",Wed:"10:00 AM–8:00 PM",Thu:"10:00 AM–8:00 PM",Fri:"10:00 AM–9:00 PM",Sat:"10:00 AM–9:00 PM",Sun:"11:00 AM–6:00 PM"},
+      services:[
+        {id:"s1",name:"Swedish Massage",price:150,duration:60},
+        {id:"s2",name:"Facial Treatment",price:180,duration:75},
+        {id:"s3",name:"Manicure",price:60,duration:40}
+      ],
+      staff:[{id:"st1",name:"Priya"},{id:"st2",name:"Farah"}],
+      ai:{name:"Bella",personality:"Calm and reassuring",languages:"English, Malay, Mandarin"},
+      bookings:[],enquiries:[],aiEnquiries:0
+    },
+    rest_003:{
+      id:"rest_003", name:"Harbor & Vine", category:"Restaurant",
+      phone:"+60 3-2222 4444", address:"5 Jalan Sultan Ismail, Kuala Lumpur",
+      hours:{Mon:"12:00 PM–10:00 PM",Tue:"12:00 PM–10:00 PM",Wed:"12:00 PM–10:00 PM",Thu:"12:00 PM–10:00 PM",Fri:"12:00 PM–11:00 PM",Sat:"12:00 PM–11:00 PM",Sun:"12:00 PM–9:00 PM"},
+      services:[], staff:[{id:"st1",name:"Chef Ray"}],
+      ai:{name:"Nova",personality:"Warm and inviting",languages:"English, Malay"},
+      menu:{
+        Starters:[{name:"Bruschetta",price:18},{name:"Soup of the Day",price:15}],
+        Mains:[{name:"Grilled Salmon",price:58},{name:"Wagyu Burger",price:42},{name:"Truffle Pasta",price:48}],
+        Desserts:[{name:"Tiramisu",price:20},{name:"Lava Cake",price:22}]
+      },
+      bookings:[],enquiries:[],aiEnquiries:0
+    }
+  },
+  slots:["10:00 AM","1:30 PM","4:00 PM"]
+};
+
+let STATE = { view:"landing", bizId:null, dashTab:"profile", chat:null };
+
+function biz(){ return DB.businesses[STATE.bizId]; }
+function uid(p){ return p+"_"+Math.random().toString(36).slice(2,7); }
+function toast(msg){
+  let t=document.createElement("div"); t.className="toast"; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2600);
+}
+function go(view,bizId){ STATE.view=view; if(bizId) STATE.bizId=bizId; render(); }
+
+/* ---------- RENDER ROOT ---------- */
+function render(){
+  const app=document.getElementById("app");
+  if(STATE.view==="landing") app.innerHTML=viewLanding();
+  else if(STATE.view==="signup") app.innerHTML=viewSignup();
+  else if(STATE.view==="dashboard") app.innerHTML=viewDashboard();
+  else if(STATE.view==="chat") app.innerHTML=viewChat();
+  if(STATE.view==="chat" && !STATE.chat) initChat();
+  if(STATE.view==="chat") scrollChat();
+}
+
+/* ---------- LANDING ---------- */
+function catIcon(cat){ return {"Hair Salon":"💇","Spa & Wellness":"🧖","Restaurant":"🍽️","Dental Clinic":"🦷"}[cat] || "🏢"; }
+function viewLanding(){
+  const chips=Object.values(DB.businesses).map(b=>`
+    <div class="biz-chip" onclick="go('chat','${b.id}')">
+      <div class="cat">${catIcon(b.category)} ${b.category}</div>
+      <h3 style="margin:.3em 0 0;font-family:inherit;font-size:1.05rem">${b.name}</h3>
+      <div class="small">Talk to ${b.ai.name}, their AI receptionist →</div>
+    </div>`).join("");
+  const loginList=Object.values(DB.businesses).map(b=>`<button class="side-link" style="color:#2A2A38" onclick="go('dashboard','${b.id}')">${b.name}</button>`).join("");
+  return `
+  <div class="topbar"><div class="wrap">
+    <div class="brand">Iceberg <span>AI</span></div>
+    <div style="position:relative">
+      <button class="btn btn-ghost btn-sm" onclick="toggleLogin()">Login</button>
+      <div id="login-pop" class="hide" style="position:absolute;right:0;top:44px;background:#fff;border-radius:14px;padding:10px;min-width:200px;box-shadow:0 20px 50px rgba(0,0,0,.35);z-index:20">
+        <div class="small" style="padding:6px 8px;color:#8A8496">Open a business dashboard</div>${loginList}
+      </div>
+    </div>
+  </div></div>
+  <div class="wrap hero view-in">
+    <h1>Your business, always available.</h1>
+    <p>AI-powered customer enquiries, bookings and human handoff — set up once, live in minutes. No code required.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="go('signup')">Start Your Business</button>
+    </div>
+    <h3 style="margin-top:56px;font-size:1rem;font-family:inherit;color:var(--ink-soft)">Or try it as a customer</h3>
+    <div class="biz-picker">${chips}</div>
+  </div>`;
+}
+function toggleLogin(){ const el=document.getElementById("login-pop"); el.classList.toggle("hide"); }
+
+/* ---------- SIGN UP ---------- */
+function viewSignup(){
+  return `
+  <div class="topbar"><div class="wrap">
+    <div class="brand">Iceberg <span>AI</span></div>
+    <button class="btn btn-ghost btn-sm" onclick="go('landing')">Back</button>
+  </div></div>
+  <div class="wrap" style="max-width:560px;padding-top:40px;padding-bottom:60px">
+    <h2>Add your business</h2>
+    <p class="small">No code, no new files — just fill this in and your AI receptionist goes live the moment you submit ✨</p>
+    <div class="card">
+      <label>Business name</label><input id="f-name" placeholder="e.g. Sunrise Nail Studio">
+      <label>Category</label>
+      <select id="f-cat"><option>Hair Salon</option><option>Spa & Wellness</option><option>Dental Clinic</option><option>Restaurant</option><option>Other</option></select>
+      <label>Phone</label><input id="f-phone" placeholder="+60 ...">
+      <label>Address</label><input id="f-addr" placeholder="Street, city">
+      <label>Opening hours (Mon–Fri)</label><input id="f-hours" placeholder="e.g. 9:00 AM–6:00 PM" value="9:00 AM–6:00 PM">
+      <button class="btn btn-primary" style="margin-top:18px" onclick="submitSignup()">Create business</button>
+    </div>
+  </div>`;
+}
+function submitSignup(){
+  const name=document.getElementById("f-name").value.trim();
+  if(!name){ toast("Please enter a business name."); return; }
+  const cat=document.getElementById("f-cat").value;
+  const phone=document.getElementById("f-phone").value||"—";
+  const addr=document.getElementById("f-addr").value||"—";
+  const hrs=document.getElementById("f-hours").value||"9:00 AM–6:00 PM";
+  const id=uid(cat.split(" ")[0].toLowerCase());
+  DB.businesses[id]={
+    id,name,category:cat,phone,address:addr,
+    hours:{Mon:hrs,Tue:hrs,Wed:hrs,Thu:hrs,Fri:hrs,Sat:"Closed",Sun:"Closed"},
+    services:[], staff:[], menu:cat==="Restaurant"?{Starters:[],Mains:[],Desserts:[]}:undefined,
+    ai:{name:"Aria",personality:"Friendly and professional",languages:"English"},
+    bookings:[], enquiries:[], aiEnquiries:0
+  };
+  STATE.bizId=id; STATE.dashTab="overview";
+  go("dashboard");
+  toast("Your AI receptionist is ready.");
+}
+
+/* ---------- DASHBOARD ---------- */
+const TABS=[["overview","📊 Dashboard"],["profile","🏢 Business"],["services","🧾 Services"],["staff","👥 Staff"],["bookings","📅 Bookings"],["hours","⏰ Opening Hours"],["ai","⚙️ AI Settings"]];
+function viewDashboard(){
+  const b=biz();
+  if(STATE.dashTab==="landing") STATE.dashTab="overview";
+  const switcher=Object.values(DB.businesses).map(x=>`<option value="${x.id}" ${x.id===b.id?"selected":""}>${x.name}</option>`).join("");
+  const links=TABS.map(([k,label])=>`<button class="side-link ${STATE.dashTab===k?'active':''}" onclick="setTab('${k}')">${label}</button>`).join("");
+  let body="";
+  if(STATE.dashTab==="overview") body=tabOverview(b);
+  else if(STATE.dashTab==="profile") body=tabProfile(b);
+  else if(STATE.dashTab==="services") body=tabServices(b);
+  else if(STATE.dashTab==="staff") body=tabStaff(b);
+  else if(STATE.dashTab==="hours") body=tabHours(b);
+  else if(STATE.dashTab==="ai") body=tabAI(b);
+  else if(STATE.dashTab==="bookings") body=tabBookings(b);
+  return `
+  <div class="dash">
+    <div class="sidebar">
+      <span class="brand">Iceberg <span>AI</span></span>
+      ${links}
+      <hr style="border-color:rgba(255,255,255,.1);margin:14px 0">
+      <select style="background:rgba(255,255,255,.05);color:#fff;border-color:var(--line)" onchange="go('dashboard',this.value)">${switcher}</select>
+      <button class="side-link" style="margin-top:8px" onclick="go('chat',biz().id)">View customer chat →</button>
+      <button class="side-link" onclick="go('landing')">Exit dashboard</button>
+    </div>
+    <div class="main view-in">${body}</div>
+  </div>`;
+}
+function setTab(t){ STATE.dashTab=t; render(); }
+
+function tabOverview(b){
+  const hr=new Date().getHours();
+  const greet=hr<12?"Good morning":hr<18?"Good afternoon":"Good evening";
+  const recent=b.bookings.slice(-5).reverse().map(x=>`<div class="list-row"><strong>${x.customer}</strong><span class="small">${x.service} · ${x.time}</span></div>`).join("") || `<p class="small">No bookings yet — they'll appear here once ${b.ai.name} books one.</p>`;
+  return `
+  <div class="pagehead"><div><h2>${greet}, ${b.name.split(" ")[0]}.</h2><p>Here's how ${b.ai.name} is doing today.</p></div></div>
+  <div class="grid2" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+    <div class="stat-card"><div class="small">📅 Today's Bookings</div><div class="stat-num">${b.bookings.length}</div></div>
+    <div class="stat-card"><div class="small">💬 AI Enquiries</div><div class="stat-num">${b.aiEnquiries||0}</div></div>
+    <div class="stat-card"><div class="small">🙋 Human Transfers</div><div class="stat-num">${b.enquiries.length}</div></div>
+  </div>
+  <h3 style="font-size:1.05rem">Recent Bookings</h3>
+  <div class="card">${recent}</div>`;
+}
+
+function tabStaff(b){
+  const rows=b.staff.map(s=>`<div class="list-row"><strong>${s.name}</strong><button class="btn btn-ghost btn-sm" onclick="removeStaff('${s.id}')">Remove</button></div>`).join("") || `<p class="small">No staff added yet.</p>`;
+  return `
+  <div class="pagehead"><div><h2>Staff</h2><p>Team members ${b.name} can assign appointments to.</p></div></div>
+  <div class="card">${rows}</div>
+  <div class="card" style="margin-top:14px">
+    <label>Staff name</label><input id="st-name" placeholder="e.g. Nadia">
+    <button class="btn btn-primary" style="margin-top:16px" onclick="addStaff()">Add staff</button>
+  </div>`;
+}
+function addStaff(){
+  const name=document.getElementById("st-name").value.trim();
+  if(!name){ toast("Enter a staff name."); return; }
+  biz().staff.push({id:uid("st"),name});
+  render(); toast("Staff added.");
+}
+function removeStaff(id){ biz().staff=biz().staff.filter(s=>s.id!==id); render(); }
+
+function tabProfile(b){
+  return `
+  <div class="pagehead"><div><h2>${b.name}</h2><p>${b.category} · ID: ${b.id}</p></div></div>
+  <div class="card">
+    <label>Business name</label><input id="p-name" value="${b.name}">
+    <label>Category</label><input id="p-cat" value="${b.category}">
+    <label>Phone</label><input id="p-phone" value="${b.phone}">
+    <label>Address</label><input id="p-addr" value="${b.address}">
+    <button class="btn btn-primary" style="margin-top:16px" onclick="saveProfile()">Save changes</button>
+  </div>`;
+}
+function saveProfile(){
+  const b=biz();
+  b.name=document.getElementById("p-name").value||b.name;
+  b.category=document.getElementById("p-cat").value||b.category;
+  b.phone=document.getElementById("p-phone").value;
+  b.address=document.getElementById("p-addr").value;
+  render(); toast("Profile saved.");
+}
+
+function tabServices(b){
+  const rows=b.services.map(s=>`
+    <div class="svc-row"><div><strong>${s.name}</strong><div class="small">${s.duration} minutes</div></div>
+    <div style="display:flex;align-items:center;gap:12px"><span>RM${s.price}</span>
+    <button class="btn btn-ghost btn-sm" onclick="removeService('${s.id}')">Remove</button></div></div>`).join("") || `<p class="small">No services yet — add your first one below.</p>`;
+  return `
+  <div class="pagehead"><div><h2>Services</h2><p>Shown to customers and used by ${b.ai.name}.</p></div></div>
+  <div class="card">${rows}</div>
+  <div class="card" style="margin-top:14px">
+    <label>Service name</label><input id="sv-name" placeholder="e.g. Manicure">
+    <div class="grid2">
+      <div><label>Price (RM)</label><input id="sv-price" type="number" placeholder="40"></div>
+      <div><label>Duration (minutes)</label><input id="sv-dur" type="number" placeholder="45"></div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="addService()">Add service</button>
+  </div>`;
+}
+function addService(){
+  const name=document.getElementById("sv-name").value.trim();
+  const price=parseFloat(document.getElementById("sv-price").value);
+  const dur=parseInt(document.getElementById("sv-dur").value);
+  if(!name||!price||!dur){ toast("Fill in all service fields."); return; }
+  biz().services.push({id:uid("s"),name,price,duration:dur});
+  render(); toast("Service added.");
+}
+function removeService(id){ biz().services=biz().services.filter(s=>s.id!==id); render(); }
+
+function tabHours(b){
+  const days=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const rows=days.map(d=>`<div class="hours-row"><strong>${d}</strong><input id="h-${d}" value="${b.hours[d]}"></div>`).join("");
+  return `
+  <div class="pagehead"><div><h2>Opening Hours</h2><p>Used by ${b.ai.name} to answer availability questions.</p></div></div>
+  <div class="card">${rows}
+    <button class="btn btn-primary" style="margin-top:16px" onclick="saveHours()">Save hours</button>
+  </div>`;
+}
+function saveHours(){
+  const days=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  days.forEach(d=> biz().hours[d]=document.getElementById("h-"+d).value);
+  render(); toast("Opening hours saved.");
+}
+
+function tabAI(b){
+  return `
+  <div class="pagehead"><div><h2>AI Receptionist Settings</h2><p>Controls how ${b.ai.name} speaks with your customers.</p></div></div>
+  <div class="card">
+    <label>Receptionist name</label><input id="ai-name" value="${b.ai.name}">
+    <label>Personality</label><input id="ai-pers" value="${b.ai.personality}">
+    <label>Languages</label><input id="ai-lang" value="${b.ai.languages}">
+    <button class="btn btn-primary" style="margin-top:16px" onclick="saveAI()">Save settings</button>
+  </div>`;
+}
+function saveAI(){
+  const b=biz();
+  b.ai.name=document.getElementById("ai-name").value||b.ai.name;
+  b.ai.personality=document.getElementById("ai-pers").value;
+  b.ai.languages=document.getElementById("ai-lang").value;
+  render(); toast("AI receptionist updated.");
+}
+
+function tabBookings(b){
+  const bk=b.bookings.map(x=>`<div class="list-row"><div><strong>${x.customer}</strong><div class="small">${x.service} · ${x.time}</div></div><span class="badge badge-${x.status}">${x.status}</span></div>`).join("") || `<p class="small">No bookings yet.</p>`;
+  const eq=b.enquiries.map(x=>`<div class="list-row"><div><strong>${x.customer}</strong><div class="small">${x.reason}</div></div><span class="badge badge-transferred">${x.status}</span></div>`).join("") || `<p class="small">No human-handoff enquiries yet.</p>`;
+  return `
+  <div class="pagehead"><div><h2>Bookings</h2><p>Live bookings created through ${b.ai.name}.</p></div></div>
+  <div class="card">${bk}</div>
+  <h3 style="margin-top:26px;font-size:1.05rem">Customer enquiries requiring a human</h3>
+  <div class="card">${eq}</div>`;
+}
+
+/* ---------- CUSTOMER CHAT (simulated AI receptionist) ---------- */
+function initChat(){
+  const b=biz(); const isRestaurant=b.category==="Restaurant";
+  STATE.chat={ msgs:[], stage:"greet", pendingService:null, pendingSlot:null, name:null, phone:null, partySize:null, menuChoices:[] };
+  addAI(isRestaurant
+    ? `Hi there 🍽️ I'm ${b.ai.name}, ${b.name}'s AI host. Ask me about our menu, hours, or say the word and I'll reserve you a table — no rush at all.`
+    : `Hi there ✨ I'm ${b.ai.name}, ${b.name}'s AI receptionist. Ask me about our services, prices or hours, or I can book your appointment whenever you're ready.`);
+}
+function addAI(text,extraHTML){ STATE.chat.msgs.push({who:"ai",text,extraHTML}); }
+function addUser(text){ STATE.chat.msgs.push({who:"user",text}); }
+function scrollChat(){ const el=document.getElementById("chat-msgs"); if(el) el.scrollTop=el.scrollHeight; }
+
+function viewChat(){
+  const b=biz();
+  const msgs=(STATE.chat?STATE.chat.msgs:[]).map(m=>`<div class="msg ${m.who}"><span class="avatar-tag">${m.who==="ai"?"🤖":"🙂"}</span>${m.text}${m.extraHTML||""}</div>`).join("");
+  const other=Object.values(DB.businesses).filter(x=>x.id!==b.id).map(x=>`<option value="${x.id}">${x.name}</option>`).join("");
+  return `
+  <div class="topbar"><div class="wrap">
+    <div class="brand">Iceberg <span>AI</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <select onchange="switchChatBiz(this.value)"><option>Switch business…</option>${other}</select>
+      <button class="btn btn-ghost btn-sm" onclick="go('landing')">Exit</button>
+    </div>
+  </div></div>
+  <div class="chat-wrap view-in">
+    <div class="chat-head"><div class="chat-avatar">🤖</div><div><strong>${b.ai.name}</strong><div class="small">✨ AI Receptionist — ${b.name}</div></div></div>
+    <div class="chat-box">
+      <div class="chat-msgs" id="chat-msgs">${msgs}</div>
+      ${STATE.chat && STATE.chat.stage==="await_confirm" ? `<div class="quick-actions" style="padding:0 16px 12px">
+        <button class="qa-btn qa-confirm" onclick="quickConfirm()">Confirm Booking</button>
+        <button class="qa-btn qa-human" onclick="quickHuman()">Talk to Human</button>
+      </div>` : ""}
+      <div style="padding:0 16px 10px;display:flex;justify-content:flex-end">
+        <span class="small" title="Voice ordering is coming in a future release" style="opacity:.55;border:1px solid var(--line);border-radius:999px;padding:.3em .8em">🎙️ Voice mode — coming soon</span>
+      </div>
+      <div class="chat-input">
+        <input id="chat-in" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+  </div>
+  <div id="transfer-modal"></div>`;
+}
+function switchChatBiz(id){ if(!id) return; STATE.bizId=id; STATE.chat=null; render(); }
+
+function sendChat(){
+  const inp=document.getElementById("chat-in");
+  const text=inp.value.trim();
+  if(!text) return;
+  inp.value="";
+  addUser(text);
+  handleUserMessage(text);
+  render();
+}
+
+function quickConfirm(){ addUser("Confirm Booking"); handleUserMessage("yes confirm"); render(); }
+function quickHuman(){ addUser("Talk to Human"); STATE.chat.stage="transfer"; addAI("Of course 💬 I'll bring in someone from our team. Could you share your name and briefly what this is about?"); render(); }
+
+function handleUserMessage(text){
+  const b=biz(); const t=text.toLowerCase(); const c=STATE.chat;
+  const isRestaurant=b.category==="Restaurant";
+  b.aiEnquiries=(b.aiEnquiries||0)+1;
+
+  if(/speak|talk to (a )?(person|someone|human)|representative|agent/.test(t)){
+    c.stage="transfer";
+    addAI(`Of course 💬 I'll bring in someone from our team. Could you share your name and briefly what this is about?`);
+    return;
+  }
+  if(c.stage==="transfer"){
+    b.enquiries.push({id:uid("e"),customer:text.split(",")[0]||text,reason:text,status:"pending"});
+    addAI(`Thank you — I've gently passed this along to the team at ${b.name}. Someone will follow up with you shortly 🙏`);
+    openTransferModal(text);
+    c.stage="greet";
+    return;
+  }
+  if(isRestaurant && /menu|dish|food|eat|offer/.test(t)){
+    const out=Object.entries(b.menu).map(([cat,items])=>`<strong>${cat}</strong><br>`+items.map(i=>`${i.name} — RM${i.price}`).join("<br>")).join("<br><br>");
+    addAI(`Here's what's on the menu today 🍴<br>${out}`);
+    return;
+  }
+  if(!isRestaurant && /price|cost|how much/.test(t)){
+    if(!b.services.length){ addAI(`We haven't listed our services just yet — I don't have pricing to share. Would you like a human to help?`); return; }
+    addAI(`Here's our current pricing, no rush to decide 🌿<br>`+b.services.map(s=>`${s.name} — RM${s.price} (${s.duration} min)`).join("<br>"));
+    return;
+  }
+  if(isRestaurant && /price|cost|how much/.test(t)){
+    const out=Object.entries(b.menu).map(([cat,items])=>items.map(i=>`${i.name} — RM${i.price}`).join(", ")).join(", ");
+    addAI(`Sure — here are our prices: ${out}.`);
+    return;
+  }
+  if(/hour|open|close|time.*open/.test(t)){
+    addAI(`Here are our hours ⏰<br>`+Object.entries(b.hours).map(([d,h])=>`${d}: ${h}`).join("<br>"));
+    return;
+  }
+  if(!isRestaurant && /service|what do you (do|have)/.test(t)){
+    if(!b.services.length){ addAI(`We haven't listed our services yet. Happy to connect you with a human for details.`); return; }
+    addAI(`We offer: `+b.services.map(s=>s.name).join(", ")+`. Whenever you're ready, I can book one for you 🌸`);
+    return;
+  }
+
+  if(isRestaurant){
+    if(/book|table|reservation|reserve/.test(t) || c.stage==="await_party"){
+      if(!c.partySize){
+        c.stage="await_party";
+        addAI(`Lovely 🥂 How many will be joining, whenever you're ready to tell me?`);
+        return;
+      }
+    }
+    if(c.stage==="await_party"){
+      const n=parseInt(text);
+      if(!n){ addAI(`Just a number is perfect — for example, 2.`); return; }
+      c.partySize=n; c.pendingService={name:`Table for ${n}`};
+      showSlots(); return;
+    }
+    if(c.stage==="await_menu_pick"){
+      if(/later|skip|no|decide/.test(t)){ finishMenu(); return; }
+      addAI(`Feel free to tap a dish above ✨ or just say "decide later" to skip.`); return;
+    }
+  } else {
+    if(/book|appointment|schedule/.test(t) || c.stage==="await_service"){
+      if(!b.services.length){ addAI(`I'm sorry, we don't have services set up to book just yet. I can get a human to help.`); return; }
+      if(!c.pendingService){
+        const match=b.services.find(s=>t.includes(s.name.toLowerCase()));
+        if(match){ c.pendingService=match; showSlots(); return; }
+        c.stage="await_service";
+        addAI(`Sure, take your time — which service would you like? `+b.services.map(s=>s.name).join(", "));
+        return;
+      }
+    }
+  }
+
+  if(c.stage==="await_slot"){
+    addAI(`Whenever you're ready, just pick one of the times shown above 🕊️`);
+    return;
+  }
+  if(c.stage==="await_name"){
+    c.name=text; c.stage="await_phone";
+    addAI(`Lovely to meet you, ${text} 💫 What's the best phone number to reach you?`);
+    return;
+  }
+  if(c.stage==="await_phone"){
+    c.phone=text; c.stage="await_confirm";
+    if(isRestaurant){
+      addAI(`Almost there — a table for <strong>${c.partySize}</strong> at <strong>${c.pendingSlot}</strong> for ${c.name} (${c.phone})${c.menuChoices.length?' with '+c.menuChoices.join(", "):''}. Shall I confirm your reservation, whenever you're ready?`);
+    } else {
+      addAI(`Almost there — <strong>${c.pendingService.name}</strong> at <strong>${c.pendingSlot}</strong> for ${c.name} (${c.phone}). Shall I confirm, whenever you're ready?`);
+    }
+    return;
+  }
+  if(c.stage==="await_confirm"){
+    if(/yes|confirm|sure|ok/.test(t)){
+      const svc=isRestaurant ? `Table for ${c.partySize}`+(c.menuChoices.length?' · '+c.menuChoices.join(", "):'') : c.pendingService.name;
+      b.bookings.push({id:uid("bk"),customer:c.name,service:svc,time:c.pendingSlot,status:"confirmed"});
+      addAI(isRestaurant ? `All set 🎉 Your table for ${c.partySize} is reserved for ${c.pendingSlot}. We can't wait to host you.` : `You're all set 🎉 Your ${c.pendingService.name} is booked for ${c.pendingSlot}. See you then.`);
+      c.pendingService=null; c.pendingSlot=null; c.partySize=null; c.menuChoices=[]; c.stage="greet";
+    } else {
+      addAI(`No problem at all 🌿 Just let me know whenever you'd like to try a different time.`);
+      c.stage="greet";
+    }
+    return;
+  }
+  // fallback
+  addAI(isRestaurant
+    ? `I don't have that on hand just yet — I can share our menu, hours, or reserve a table whenever you're ready. I can also bring in a human if you'd like.`
+    : `I don't have that on hand just yet — I can check our services, prices, hours, or book an appointment whenever suits you. I can also bring in a human if you'd like.`);
+}
+
+function menuChipsHTML(b){
+  const items=[].concat(...Object.values(b.menu));
+  const chips=items.map(m=>`<button class="slot-btn pop" onclick="toggleMenuItem('${m.name}')">${m.name} · RM${m.price}</button>`).join("");
+  return `<div class="slots">${chips}<button class="slot-btn pop" onclick="skipMenu()">I'll decide later</button></div>`;
+}
+function toggleMenuItem(name){
+  const c=STATE.chat;
+  c.menuChoices.push(name); addUser(name);
+  addAI(`Added ${name} 🍽️ Tap another dish, or continue whenever you're ready.`, `<div class="quick-actions"><button class="qa-btn qa-confirm" onclick="finishMenu()">Continue</button></div>`);
+  render();
+}
+function skipMenu(){ addUser("I'll decide later"); finishMenu(); }
+function finishMenu(){
+  const c=STATE.chat; c.stage="await_name";
+  addAI(c.menuChoices.length ? `Wonderful — I've noted ${c.menuChoices.join(", ")} 🌿 What name should I book the table under?` : `No problem, you can decide when you arrive 🌿 What name should I book the table under?`);
+  render();
+}
+
+function showSlots(){
+  const c=STATE.chat; const b=biz();
+  c.stage="await_slot";
+  const btns=DB.slots.map(s=>`<button class="slot-btn pop" onclick="pickSlot('${s}')">${s}</button>`).join("");
+  const intro=b.category==="Restaurant" ? `Table for ${c.partySize} — here's tomorrow's availability, take your time 🕰️:` : `Great choice — ${c.pendingService.name}${c.pendingService.price?` (RM${c.pendingService.price}, ${c.pendingService.duration} min)`:''}. Here's tomorrow's availability:`;
+  addAI(intro, `<div class="slots">${btns}</div>`);
+  render();
+}
+function pickSlot(s){
+  const c=STATE.chat; const b=biz();
+  c.pendingSlot="Tomorrow "+s;
+  addUser(s);
+  if(b.category==="Restaurant"){
+    c.stage="await_menu_pick";
+    addAI(`Noted for ${c.pendingSlot} 🥂 Would you like to preview a few dishes, or decide when you arrive?`, menuChipsHTML(b));
+  } else {
+    c.stage="await_name";
+    addAI(`Would you like me to confirm your appointment for ${c.pendingSlot}? First, what's your name?`);
+  }
+  render();
+}
+
+/* ---------- HUMAN TRANSFER MODAL ---------- */
+function openTransferModal(summary){
+  const b=biz();
+  const el=document.getElementById("transfer-modal");
+  if(!el) return;
+  el.innerHTML=`
+  <div class="overlay" onclick="if(event.target===this)closeTransfer()">
+    <div class="modal">
+      <h3 style="font-family:inherit">Transferring to a human</h3>
+      <div class="row"><span>Business</span><strong>${b.name}</strong></div>
+      <div class="row"><span>Reason</span><strong style="text-align:right;max-width:60%">${summary}</strong></div>
+      <div class="row"><span>Conversation summary</span><strong style="text-align:right;max-width:60%">${STATE.chat.msgs.length} messages exchanged</strong></div>
+      <div class="row" style="border-bottom:none"><span>Status</span><span class="badge badge-pending">Pending human pickup</span></div>
+      <button class="btn btn-primary" style="margin-top:16px;width:100%" onclick="closeTransfer()">Got it</button>
+    </div>
+  </div>`;
+}
+function closeTransfer(){ document.getElementById("transfer-modal").innerHTML=""; }
+
+render();
+setTimeout(()=>{
+  const intro=document.getElementById("intro");
+  if(intro){
+    intro.classList.add("doors-open");
+    setTimeout(()=>{ intro.classList.add("intro-hide"); setTimeout(()=>intro.remove(),2100); },2100);
+  }
+},1700);
+</script>
+</body>
+</html>
