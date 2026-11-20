@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ARUS – Selangor & Kuala Lumpur Flood Alert</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--deep:#08283A;--river:#0E6E7E;--foam:#DDF3F1;--paper:#F4FBF9;--sun:#FFB92E;--hib:#D62F46;--ink:#08283A;--sp:env(safe-area-inset-top,0px);box-sizing:border-box;padding-top:var(--sp)}
+@media(prefers-color-scheme:dark){:root{color-scheme:light}}
+*,*::before,*::after{box-sizing:inherit}html{scroll-behavior:auto}
+body{margin:0;font:400 1.15rem/1.6 "Atkinson Hyperlegible",system-ui,sans-serif;color:var(--ink);background:var(--deep)}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.05;margin:0 0 .5em}
+h2{font-size:clamp(2.2rem,6vw,4.2rem);font-weight:900}h3{font-size:1.6rem}
+a{color:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:60px;padding:0 28px;font:700 1.25rem "Atkinson Hyperlegible",sans-serif;background:var(--sun);color:var(--deep);border:3px solid var(--deep);border-radius:18px;box-shadow:0 6px 0 var(--deep);cursor:pointer;text-decoration:none;transition:transform .12s,box-shadow .12s}
+.btn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--deep)}.btn.red{background:var(--hib);color:#fff}.btn.alt{background:#fff}
+:focus-visible{outline:5px solid #1a5cff;outline-offset:3px}
+input,select,textarea{width:100%;min-height:58px;font:inherit;font-size:1.15rem;padding:10px 14px;border:3px solid var(--deep);border-radius:14px;background:#fff;color:var(--ink)}
+label{display:block;font-weight:700;margin:14px 0 6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.songket{height:20px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='20'%3E%3Cpath d='M0 20L14 0L28 20Z' fill='%23FFB92E'/%3E%3Cpath d='M7 20L14 9L21 20Z' fill='%23D62F46'/%3E%3C/svg%3E") repeat-x}
+/* intro */
+#intro{position:fixed;inset:0;z-index:100;display:grid;place-items:center}
+#grid{position:absolute;inset:0;display:grid}#grid i{background:var(--deep);opacity:1;transition:opacity .25s}
+#intro.go #grid i{opacity:0}#intro.go .it{opacity:0}
+.it{position:relative;font:900 clamp(3rem,14vw,8rem)/1 Fraunces,serif;color:var(--sun);transition:opacity .4s}
+.blurx span{display:inline-block;animation:bx 1.6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes bx{from{filter:blur(30px);opacity:0;letter-spacing:-.25em;transform:scale(.6)}to{filter:blur(0);opacity:1;letter-spacing:.06em;transform:none}}
+.blurx.hold span{animation:none;opacity:0}.on .blurx.hold span{animation:bx 1.6s cubic-bezier(.2,.7,.2,1) both;opacity:1}
+/* nav */
+#nav{position:fixed;top:calc(10px + var(--sp));left:50%;transform:translateX(-50%);z-index:60;max-width:calc(100% - 20px);background:#fff;border:3px solid var(--deep);border-radius:60px;padding:6px;box-shadow:0 6px 0 var(--deep);display:flex;overflow-x:auto;scrollbar-width:none}
+#nav .in{position:relative;display:flex;gap:2px}.goo{position:absolute;inset:0;filter:url(#goo);pointer-events:none}
+.blob,.drop{position:absolute;top:0;height:100%;background:var(--sun);border-radius:40px}
+.blob{transition:left .45s cubic-bezier(.5,1.5,.5,1),width .45s cubic-bezier(.5,1.5,.5,1)}.drop{transition:left .75s cubic-bezier(.4,1.6,.5,1),width .6s;top:-6px;height:calc(100% + 12px);transform:scaleX(.7)}
+#nav a{position:relative;z-index:2;padding:12px 18px;font-weight:700;font-size:1.05rem;text-decoration:none;border-radius:40px;white-space:nowrap}
+.lang{position:fixed;top:calc(78px + var(--sp));right:14px;z-index:60;display:flex;gap:6px}.lang button{min-height:44px;min-width:48px;font-weight:700;border:3px solid var(--deep);border-radius:12px;background:#fff;cursor:pointer;font-size:1rem}.lang .a{background:var(--sun)}
+#gauge{position:fixed;right:0;top:0;bottom:0;width:12px;z-index:55;background:rgba(8,40,58,.25)}#gauge b{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(#58c4d6,#0E6E7E);height:0}
+/* sections */
+.stk{position:sticky;border-radius:40px 40px 0 0;box-shadow:0 -24px 50px rgba(0,0,0,.25);padding:90px 0 80px;min-height:100vh}
+.sec-paper{background:var(--paper)}.sec-foam{background:var(--foam)}.sec-sun{background:#FFE7A8}
+#home{background:linear-gradient(180deg,#0b3550 0%,#0E6E7E 62%,#f6b84c 100%);color:#fff;min-height:100vh;position:relative;overflow:hidden;display:grid;align-content:center;padding:130px 0 160px}
+#sun{position:absolute;right:12%;bottom:22%;width:min(32vw,300px);aspect-ratio:1;border-radius:50%;background:radial-gradient(#fff3c4,#FFB92E 60%,rgba(255,185,46,0) 72%);transform:translateY(calc(var(--sy,0)*-.25px))}
+.wv{position:absolute;left:0;bottom:0;width:200%;height:150px;animation:wv 14s linear infinite}.wv.b{bottom:-20px;opacity:.7;animation-duration:22s;animation-direction:reverse}@keyframes wv{to{transform:translateX(-50%)}}
+#home h1{font-size:clamp(5rem,22vw,15rem);font-weight:900;margin:0;color:#fff}
+.sub{font-size:clamp(1.3rem,3vw,2rem);max-width:640px;margin:10px 0 30px}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-block;padding:4px 14px;border-radius:30px;font-weight:700;font-size:1rem;border:2px solid var(--deep);background:#fff}
+.L0{background:#1E8E4E;color:#fff}.L1{background:#F2C200}.L2{background:#F07A1A}.L3{background:var(--hib);color:#fff}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:24px}
+.card{background:#fff;border:3px solid var(--deep);border-radius:22px;padding:20px;box-shadow:0 6px 0 var(--deep)}
+.dist{text-align:left;font:inherit;cursor:pointer;width:100%}.dist h3{margin:0 0 8px}
+.note{font-size:1rem;opacity:.85}
+.two{display:grid;grid-template-columns:1fr 1.2fr;gap:30px;align-items:start}
+@media(max-width:860px){.two{grid-template-columns:1fr}}
+.rep{margin-bottom:18px}.rep small{display:block;opacity:.8}.upd{border-left:5px solid var(--river);margin:8px 0;padding-left:10px;font-size:1rem}
+.demo{background:#555;color:#fff;font-size:.8rem;padding:2px 8px;border-radius:6px;margin-left:8px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row select{width:auto;flex:1;min-width:130px}
+.hc.done{opacity:.6}
+/* horizontal */
+#hz{position:relative;background:var(--deep);color:#fff;border-radius:40px 40px 0 0}
+.pin{position:sticky;top:0;height:100vh;overflow:hidden;padding-top:100px}
+.trk{display:flex;gap:28px;padding:0 6vw;height:calc(100% - 120px);align-items:stretch;will-change:transform}
+.pn{flex:0 0 min(86vw,520px);background:#0f3d57;border:3px solid var(--sun);border-radius:28px;padding:26px;overflow:auto}.pn.intro{background:none;border:0;flex-basis:min(86vw,420px)}
+.pn li{margin:8px 0}.pn .btn{margin-top:10px}.pn h3{color:var(--sun)}
+.big{font-size:clamp(3rem,9vw,5rem);font-weight:900;font-family:Fraunces,serif;color:var(--sun);text-decoration:none;display:block}
+details{background:#fff;border:3px solid var(--deep);border-radius:18px;margin:12px 0;padding:6px 18px}summary{min-height:56px;display:flex;align-items:center;font-weight:700;font-size:1.25rem;cursor:pointer}
+.stats{display:flex;gap:14px;flex-wrap:wrap;margin:16px 0}.stats div{flex:1;min-width:130px;background:#fff;border:3px solid var(--deep);border-radius:18px;padding:12px;text-align:center}.stats b{display:block;font:900 2.4rem Fraunces,serif}
+#intel{background:var(--deep);color:#fff}#intel .card{color:var(--ink)}
+footer{background:#041a27;color:#cfe;padding:50px 0;position:relative}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:var(--deep);color:#fff;padding:16px 24px;border-radius:16px;font-weight:700;z-index:90;transition:transform .35s cubic-bezier(.3,1.6,.5,1);border:3px solid var(--sun)}#toast.s{transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){#intro{display:none}.wv{animation:none}.blurx span,.on .blurx.hold span{animation:none;opacity:1}.blurx.hold span{opacity:1}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="9"/><feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 22 -9"/></filter></svg>
+<div id="intro"><div id="grid"></div><div class="it blurx" aria-label="ARUS"></div></div>
+<nav id="nav" aria-label="Main"><div class="in"><div class="goo"><div class="drop"></div><div class="blob"></div></div></div></nav>
+<div class="lang" role="group" aria-label="Language"><button data-l="en" class="a">EN</button><button data-l="ms">BM</button><button data-l="zh">中文</button></div>
+<div id="gauge" aria-hidden="true"><b></b></div>
+<main id="main">
+<section id="home"><div id="sun"></div>
+<div class="wrap" style="position:relative;z-index:2"><h1 class="blurx hold" aria-label="ARUS"></h1>
+<p class="sub" data-i="sub">Community flood alerts for Selangor &amp; Kuala Lumpur. Know first. Get help. Give help.</p>
+<div class="chips"><a class="btn red" href="#report" data-go="report" data-i="cta">Report a flood</a><a class="btn alt" href="#alerts" data-go="alerts">See alerts near me</a><a class="btn" href="tel:999">Call 999</a></div>
+<p class="note" style="margin-top:26px;max-width:560px">Community project. Not an official government service. In danger? Call 999 first.</p></div>
+<svg class="wv" viewBox="0 0 1200 80" preserveAspectRatio="none"><path d="M0 40Q150 0 300 40T600 40T900 40T1200 40V80H0Z" fill="#F4FBF9"/></svg>
+<svg class="wv b" viewBox="0 0 1200 80" preserveAspectRatio="none"><path d="M0 30Q150 70 300 30T600 30T900 30T1200 30V80H0Z" fill="#0E6E7E" opacity=".5"/></svg></section>
+
+<section id="alerts" class="stk sec-paper"><div class="songket" style="position:absolute;top:0;left:0;right:0;border-radius:40px 40px 0 0"></div><div class="wrap">
+<h2>Alerts by district</h2><p style="max-width:700px">Colours show what neighbours on this device have reported. They are not official warnings. Official alerts come only from verified administrators.</p>
+<div class="row"><select id="state" aria-label="State"><option>Johor</option><option>Kedah</option><option>Kelantan</option><option>Kuala Lumpur</option><option>Labuan</option><option>Melaka</option><option>Negeri Sembilan</option><option>Pahang</option><option>Penang</option><option>Perak</option><option>Perlis</option><option>Putrajaya</option><option>Sabah</option><option>Sarawak</option><option selected>Selangor</option><option>Terengganu</option></select></div>
+<div class="dgrid" id="dg"></div></div></section>
+
+<section id="report" class="stk sec-foam"><div class="wrap two"><div>
+<h2>Report a flood</h2><p>Short and simple. No account needed for a basic report.</p>
+<form id="rf" class="card"><label for="rd">District</label><select id="rd"></select>
+<label for="ra">Neighbourhood or road</label><input id="ra" required placeholder="e.g. Taman Sri Muda">
+<label for="rl">Water level</label><select id="rl"><option value="1">Ankle-deep</option><option value="2">Knee-deep</option><option value="3">Waist-deep or higher</option></select>
+<label for="rr">Road</label><select id="rr"><option value="Passable">Passable</option><option value="Difficult">Difficult</option><option value="Impassable">Impassable</option></select>
+<label for="rt">What do you see?</label><textarea id="rt" rows="3"></textarea>
+<label for="rp">Photo (optional, shrunk to save data)</label><input id="rp" type="file" accept="image/*">
+<label style="display:flex;gap:12px;align-items:center"><input id="rs" type="checkbox" style="width:30px;min-height:30px"> People are stranded</label>
+<button class="btn red" style="margin-top:16px;width:100%">Send report</button></form>
+<p class="note" id="mn">Saved on this device for the demo. Sharing between users needs the backend.</p></div>
+<div><div class="row"><h3 style="margin:0">Latest reports</h3><select id="ff" aria-label="Filter by district"></select></div><div id="feed" style="margin-top:16px"></div></div></div></section>
+
+<section id="hz"><div class="pin"><div class="trk" id="trk">
+<div class="pn intro"><h2 style="color:#fff">Emergency response</h2><p>Keep scrolling. Each card is one step.</p><span class="btn" aria-hidden="true">Scroll →</span></div>
+<div class="pn"><h3>Before a flood</h3><ul><li>Pack a go-bag: water, food, torch, medicine.</li><li>Put IDs in a waterproof bag.</li><li>Find your nearest evacuation centre.</li><li>Plan two routes out.</li></ul><button class="btn alt" data-dl>Download checklist</button></div>
+<div class="pn"><h3>During a flood</h3><ul><li>Move to higher ground early.</li><li>Never walk or drive through floodwater.</li><li>Switch off power only if it is safe.</li><li>Follow official evacuation orders.</li><li>Do not attempt water rescues yourself. Call 999.</li></ul></div>
+<div class="pn"><h3>After a flood</h3><ul><li>Wait for official clearance to return.</li><li>Avoid wet electrical items.</li><li>Use safe drinking water.</li><li>Photograph damage from a safe spot.</li><li>See a doctor if exposed to dirty floodwater.</li></ul></div>
+<div class="pn"><h3>Emergency contacts</h3><a class="big" href="tel:999">999</a><p>Police, fire and ambulance. For others, use official sites:</p><p><a href="https://www.nadma.gov.my" rel="noopener" target="_blank">NADMA</a> · <a href="https://www.jkm.gov.my" rel="noopener" target="_blank">JKM</a> · <a href="https://www.civildefence.gov.my" rel="noopener" target="_blank">APM</a> · <a href="https://www.bomba.gov.my" rel="noopener" target="_blank">Bomba</a></p></div>
+<div class="pn"><h3>Evacuation centres (PPS)</h3><p><b>No verified centres published yet.</b></p><p>We never invent names, capacity or status. Centres appear here only after an administrator checks an official source and records the time.</p><p>Check JKM or your district disaster office for open centres.</p><p class="note">Maps never guarantee a safe route. Follow responders.</p></div>
+</div></div></section>
+
+<section id="relief" class="stk sec-sun"><div class="wrap two"><div>
+<h2>Community relief</h2><p>Ask for help, or offer it. Rescue goes to 999, not volunteers.</p>
+<form id="hf" class="card"><label for="hk">I want to</label><select id="hk"><option value="Request">Ask for help</option><option value="Offer">Offer help</option></select>
+<label for="hc">What</label><select id="hc"><option value="Food">Food</option><option value="Drinking water">Drinking water</option><option value="Blankets and clothing">Blankets and clothing</option><option value="Medicine">Medicine</option><option value="Baby supplies">Baby supplies</option><option value="Transport">Transport</option><option value="Temporary shelter">Temporary shelter</option><option value="Boat or rescue">Boat or rescue</option></select>
+<label for="hd">District</label><select id="hd"></select><label for="hn">People or quantity</label><input id="hn" type="number" min="1" value="1"><label for="hp">Phone number</label><input id="hp" type="tel" inputmode="tel" required placeholder="012-345 6789"><label for="hm">Your name (optional)</label><input id="hm" maxlength="40">
+<button class="btn" style="margin-top:16px;width:100%">Send</button></form></div>
+<div><div class="stats"><div><b id="s1">0</b>Requests</div><div><b id="s2">0</b>Offers</div><div><b id="s3">0</b>Matched</div><div><b id="s4">0</b>Resolved</div></div><div id="hl"></div><p class="note">Phone numbers are shown to everyone who opens this page. Posts disappear after 48 hours.</p></div></div></section>
+
+<section id="ready" class="stk sec-paper"><div class="wrap" style="max-width:860px"><h2>Flood Ready</h2>
+<details><summary>1. What is a flash flood?</summary><p>Heavy rain arrives faster than drains and rivers can carry it. In cities, roads and concrete send water to low ground within minutes. Warning signs: dark clouds, rising drains, muddy fast water.</p></details>
+<details><summary>2. Your go-bag</summary><p>Water, ready food, medicine, torch, power bank, copies of IDs in a waterproof bag, and extra care items for children, elders and anyone with a disability.</p></details>
+<details><summary>3. Evacuation centres</summary><p>Temporary centres open when authorities activate them. Bring IDs, medicine, bedding and snacks. Elders, babies and the disabled are helped first.</p></details>
+<details><summary>4. Giving help well</summary><p>Ask what is needed before donating. Coordinate with local groups so one street is not flooded with rice while another has none.</p></details>
+<details><summary>5. Check before you share</summary><p>Look for who posted it, when, and where. Share official sources first. If unsure, do not forward.</p></details>
+<p><button class="btn" data-dl>Download checklist</button></p></div></section>
+
+<section id="intel" class="stk"><div class="wrap"><h2>Flood intelligence</h2><p style="max-width:720px">Official data stays official. Live rainfall and river levels need server access and credentials, so nothing here is made up. Open the source directly:</p>
+<div class="dgrid"><a class="card" href="https://www.met.gov.my" target="_blank" rel="noopener"><h3>METMalaysia</h3>Weather and rainfall warnings</a><a class="card" href="https://publicinfobanjir.water.gov.my" target="_blank" rel="noopener"><h3>Public Infobanjir</h3>River levels and rainfall stations</a><a class="card" href="https://www.nadma.gov.my" target="_blank" rel="noopener"><h3>NADMA</h3>National disaster updates</a><a class="card" href="https://www.jkm.gov.my" target="_blank" rel="noopener"><h3>JKM</h3>Welfare and relief centres</a></div></div></section>
+</main>
+<footer><div class="songket" style="position:absolute;top:0;left:0;right:0"></div><div class="wrap"><b>ARUS</b><p>An independent community project, not endorsed by NADMA, JKM or any agency. Sample reports are labelled DEMO. Reports and relief posts disappear after 48 hours.</div></footer>
+<div id="toast" role="status"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const ST={"Johor": ["Batu Pahat", "Johor Bahru", "Kluang", "Kota Tinggi", "Kulai", "Ledang (Tangkak)", "Mersing", "Muar", "Pontian", "Segamat"], "Kedah": ["Baling", "Bandar Baharu", "Kota Setar", "Kuala Muda", "Kubang Pasu", "Kulim", "Langkawi", "Padang Terap", "Pendang", "Pokok Sena", "Sik", "Yan"], "Kelantan": ["Bachok", "Gua Musang", "Jeli", "Kota Bharu", "Kuala Krai", "Machang", "Pasir Mas", "Pasir Puteh", "Tanah Merah", "Tumpat"], "Kuala Lumpur": ["KL City Centre", "Cheras", "Setapak", "Wangsa Maju", "Kepong", "Segambut", "Sentul", "Bukit Bintang", "Titiwangsa", "Seputeh", "Lembah Pantai", "Bandar Tun Razak"], "Labuan": ["Labuan"], "Melaka": ["Alor Gajah", "Jasin", "Melaka Tengah"], "Negeri Sembilan": ["Jelebu", "Jempol", "Kuala Pilah", "Port Dickson", "Rembau", "Seremban", "Tampin"], "Pahang": ["Bentong", "Bera", "Cameron Highlands", "Jerantut", "Kuantan", "Lipis", "Maran", "Pekan", "Raub", "Rompin", "Temerloh"], "Penang": ["Barat Daya", "Seberang Perai Selatan", "Seberang Perai Tengah", "Seberang Perai Utara", "Timur Laut"], "Perak": ["Bagan Datuk", "Batang Padang", "Hilir Perak", "Hulu Perak", "Kampar", "Kerian", "Kinta", "Kuala Kangsar", "Larut Matang and Selama", "Manjung", "Muallim", "Perak Tengah"], "Perlis": ["Kangar", "Arau", "Padang Besar"], "Putrajaya": ["Putrajaya"], "Sabah": ["Beaufort", "Beluran", "Kalabakan", "Keningau", "Kinabatangan", "Kota Belud", "Kota Kinabalu", "Kota Marudu", "Kuala Penyu", "Kudat", "Kunak", "Lahad Datu", "Nabawan", "Papar", "Penampang", "Pitas", "Putatan", "Ranau", "Sandakan", "Semporna", "Sipitang", "Tambunan", "Tawau", "Telupid", "Tenom", "Tongod"], "Sarawak": ["Betong", "Bintulu", "Kapit", "Kuching", "Limbang", "Miri", "Mukah", "Samarahan", "Sarikei", "Serian", "Sibu", "Sri Aman"], "Selangor": ["Petaling", "Klang", "Gombak", "Hulu Langat", "Hulu Selangor", "Kuala Langat", "Kuala Selangor", "Sabak Bernam", "Sepang"], "Terengganu": ["Besut", "Dungun", "Hulu Terengganu", "Kemaman", "Kuala Nerus", "Kuala Terengganu", "Marang", "Setiu"]};
+const HINT={Sarawak:"Sarawak is shown by its 12 divisions.",Perlis:"Perlis has no districts, so its main towns are shown.","Kuala Lumpur":"Kuala Lumpur is shown by its main areas.",Putrajaya:"Putrajaya is a single area.",Labuan:"Labuan is a single area."};
+const SD={};Object.entries(ST).forEach(([s,a])=>a.forEach(d=>SD[d]=s));const ALL=Object.keys(SD);
+const grp=()=>Object.entries(ST).map(([s,a])=>`<optgroup label="${s}">${opt(a)}</optgroup>`).join("");
+const NAV=["Home","Alerts","Report","Respond","Relief","Ready","Intel"];
+const TR=[["Home","Utama","首页"],["Alerts","Amaran","警报"],["Report","Lapor","报告"],["Respond","Bantuan","应急"],["Relief","Relif","救援"],["Ready","Siap Siaga","防灾"],["Intel","Pantau","监测"],
+["ARUS – Selangor & Kuala Lumpur Flood Alert","ARUS – Amaran Banjir Selangor & Kuala Lumpur","ARUS – 雪兰莪与吉隆坡洪水警报"],
+["Community flood alerts for Selangor & Kuala Lumpur. Know first. Get help. Give help.","Amaran banjir komuniti untuk Selangor & Kuala Lumpur. Tahu dahulu. Dapatkan bantuan. Hulurkan bantuan.","雪兰莪与吉隆坡社区洪水警报。先知晓，得帮助，伸援手。"],
+["Report a flood","Lapor banjir","报告水灾"],["See alerts near me","Lihat amaran berdekatan","查看附近警报"],["Call 999","Hubungi 999","拨打 999"],
+["Community project. Not an official government service. In danger? Call 999 first.","Projek komuniti. Bukan perkhidmatan rasmi kerajaan. Dalam bahaya? Hubungi 999 dahulu.","社区项目，非政府官方服务。身处危险？请先拨打999。"],
+["Sarawak is shown by its 12 divisions.","Sarawak dipaparkan mengikut 12 bahagian.","砂拉越按12个省份（分区）显示。"],["Perlis has no districts, so its main towns are shown.","Perlis tiada daerah, jadi bandar utamanya dipaparkan.","玻璃市没有县，因此显示主要城镇。"],["Kuala Lumpur is shown by its main areas.","Kuala Lumpur dipaparkan mengikut kawasan utama.","吉隆坡按主要区域显示。"],["Putrajaya is a single area.","Putrajaya ialah satu kawasan.","布城为单一区域。"],["Labuan is a single area.","Labuan ialah satu kawasan.","纳闽为单一区域。"],["Phone number","Nombor telefon","电话号码"],["Your name (optional)","Nama anda (pilihan)","您的名字（可选）"],["Mark as resolved","Tandakan selesai","标记为已解决"],["Resolved","Selesai","已解决"],["Posted","Disiarkan","发布于"],["Expires","Tamat","到期"],["Phone numbers are shown to everyone who opens this page. Posts disappear after 48 hours.","Nombor telefon dipaparkan kepada semua yang membuka halaman ini. Hantaran hilang selepas 48 jam.","电话号码会向所有打开此页面的人显示。帖子48小时后消失。"],["Shared database connected. Reports disappear after 48 hours.","Pangkalan data dikongsi disambungkan. Laporan hilang selepas 48 jam.","已连接共享数据库。报告48小时后消失。"],["Please enter a valid phone number.","Sila masukkan nombor telefon yang sah.","请输入有效的电话号码。"],["Marked as resolved. Thank you.","Ditandakan selesai. Terima kasih.","已标记为解决，谢谢。"],["Could not save. You may need Contributor access.","Tidak dapat disimpan. Anda mungkin perlukan akses Penyumbang.","无法保存。您可能需要“贡献者”权限。"],["Saved. Others can now see your number and call you.","Disimpan. Orang lain kini boleh melihat nombor anda dan menghubungi anda.","已保存。其他人现在可以看到您的号码并致电您。"],["Alerts by district","Amaran mengikut daerah","按县区查看警报"],
+["Colours show what neighbours on this device have reported. They are not official warnings. Official alerts come only from verified administrators.","Warna menunjukkan laporan jiran pada peranti ini. Ia bukan amaran rasmi. Amaran rasmi hanya daripada pentadbir yang disahkan.","颜色代表此设备上邻居的报告，并非官方警告。官方警报只来自经核实的管理员。"],
+["State","Negeri","州属"],
+["GREEN · Normal","HIJAU · Normal","绿色 · 正常"],["YELLOW · Watch","KUNING · Berjaga-jaga","黄色 · 留意"],["ORANGE · Flooding reported","JINGGA · Banjir dilaporkan","橙色 · 已报告水灾"],["RED · Severe","MERAH · Teruk","红色 · 严重"],
+["No reports on this device.","Tiada laporan pada peranti ini.","此设备暂无报告。"],["Watch rainfall and drains.","Pantau hujan dan longkang.","留意降雨和排水沟。"],["Be ready to move. Avoid low roads.","Bersedia berpindah. Elakkan jalan rendah.","准备撤离，避开低洼道路。"],["Move to safety. Call 999 if trapped.","Berpindah ke tempat selamat. Hubungi 999 jika terperangkap.","转移到安全处。被困请拨打999。"],
+["Short and simple. No account needed for a basic report.","Ringkas dan mudah. Tidak perlu akaun untuk laporan asas.","简单快捷。基本报告无需账号。"],
+["District","Daerah","县区"],["Neighbourhood or road","Taman atau jalan","社区或道路"],["Water level","Paras air","水位"],["Road","Jalan","道路"],["What do you see?","Apa yang anda nampak?","您看到了什么？"],
+["Photo (optional, shrunk to save data)","Foto (pilihan, dikecilkan untuk jimat data)","照片（可选，自动压缩省流量）"],["People are stranded","Ada orang terperangkap","有人被困"],["Send report","Hantar laporan","提交报告"],
+["Ankle-deep","Paras buku lali","及脚踝"],["Knee-deep","Paras lutut","及膝盖"],["Waist-deep or higher","Paras pinggang atau lebih","及腰部或更深"],["Waist-deep+","Paras pinggang+","及腰部以上"],
+["Passable","Boleh dilalui","可通行"],["Difficult","Sukar","难行"],["Impassable","Tidak boleh dilalui","无法通行"],["e.g. Taman Sri Muda","cth. Taman Sri Muda","例如 Taman Sri Muda"],
+["Saved on this device for the demo. Sharing between users needs the backend.","Disimpan pada peranti ini untuk demo. Perkongsian antara pengguna memerlukan pelayan.","演示数据仅保存在此设备。跨用户共享需要后端。"],
+["Latest reports","Laporan terkini","最新报告"],["All districts","Semua daerah","所有县区"],["Filter by district","Tapis ikut daerah","按县区筛选"],
+["Stranded","Terperangkap","被困"],["Community Confirmed","Disahkan Komuniti","社区确认"],["Newly Reported","Baru Dilaporkan","新报告"],["confirmations","pengesahan","次确认"],["not an official alert","bukan amaran rasmi","非官方警报"],
+["Water rising","Air meningkat","水位上升"],["Water stable","Air stabil","水位稳定"],["Water decreasing","Air surut","水位下降"],["AMPLIFY FLOOD ALERT","KUATKAN AMARAN BANJIR","扩散水灾警报"],
+["Rising","Meningkat","上升"],["Stable","Stabil","稳定"],["Decreasing","Menurun","下降"],["Water trend","Aliran paras air","水位趋势"],
+["No reports here yet. Be the first to report.","Belum ada laporan. Jadilah yang pertama melapor.","暂无报告，欢迎第一个报告。"],
+["DEMO: water rising near the drain.","DEMO: air naik berhampiran longkang.","演示：排水沟附近水位上升。"],["DEMO: ankle-deep water, roads open.","DEMO: air paras buku lali, jalan terbuka.","演示：水深及脚踝，道路畅通。"],
+["Emergency response","Tindakan kecemasan","应急响应"],["Keep scrolling. Each card is one step.","Teruskan tatal. Setiap kad satu langkah.","继续滚动，每张卡片是一步。"],["Scroll →","Tatal →","滚动 →"],
+["Before a flood","Sebelum banjir","洪水之前"],["Pack a go-bag: water, food, torch, medicine.","Sediakan beg kecemasan: air, makanan, lampu suluh, ubat.","准备应急包：水、食物、手电筒、药品。"],["Put IDs in a waterproof bag.","Simpan dokumen dalam beg kalis air.","证件放进防水袋。"],["Find your nearest evacuation centre.","Cari pusat pemindahan terdekat.","找到最近的疏散中心。"],["Plan two routes out.","Rancang dua laluan keluar.","规划两条撤离路线。"],["Download checklist","Muat turun senarai semak","下载清单"],
+["During a flood","Semasa banjir","洪水期间"],["Move to higher ground early.","Berpindah ke tempat tinggi lebih awal.","尽早转移到高处。"],["Never walk or drive through floodwater.","Jangan sekali-kali redah atau pandu melalui air banjir.","切勿涉水或驾车穿过洪水。"],["Switch off power only if it is safe.","Matikan elektrik hanya jika selamat.","只有安全时才关闭电源。"],["Follow official evacuation orders.","Ikut arahan pemindahan rasmi.","遵守官方撤离指示。"],["Do not attempt water rescues yourself. Call 999.","Jangan cuba menyelamat di dalam air sendiri. Hubungi 999.","不要自行涉水救援，请拨打999。"],
+["After a flood","Selepas banjir","洪水之后"],["Wait for official clearance to return.","Tunggu kebenaran rasmi untuk pulang.","等官方许可后再返回。"],["Avoid wet electrical items.","Elakkan peralatan elektrik yang basah.","避免接触浸湿的电器。"],["Use safe drinking water.","Gunakan air minuman selamat.","使用安全饮用水。"],["Photograph damage from a safe spot.","Ambil gambar kerosakan dari tempat selamat.","在安全位置拍摄损失。"],["See a doctor if exposed to dirty floodwater.","Jumpa doktor jika terdedah kepada air banjir kotor.","接触脏洪水后请就医。"],
+["Emergency contacts","Hubungan kecemasan","紧急联系"],["Police, fire and ambulance. For others, use official sites:","Polis, bomba dan ambulans. Lain-lain, gunakan laman rasmi:","警察、消防和救护车。其他请使用官方网站："],
+["Evacuation centres (PPS)","Pusat pemindahan (PPS)","疏散中心 (PPS)"],["No verified centres published yet.","Belum ada pusat disahkan diterbitkan.","暂无经核实的疏散中心。"],
+["We never invent names, capacity or status. Centres appear here only after an administrator checks an official source and records the time.","Kami tidak mereka nama, kapasiti atau status. Pusat hanya dipaparkan selepas pentadbir menyemak sumber rasmi dan merekod masa.","我们绝不编造名称、容量或状态。只有管理员核对官方来源并记录时间后，才会显示。"],
+["Check JKM or your district disaster office for open centres.","Semak JKM atau pejabat bencana daerah anda untuk pusat yang dibuka.","请向JKM或县区灾害办公室查询开放的中心。"],["Maps never guarantee a safe route. Follow responders.","Peta tidak menjamin laluan selamat. Ikut arahan petugas.","地图不保证路线安全，请听从救援人员。"],
+["Community relief","Relif komuniti","社区救援"],["Ask for help, or offer it. Rescue goes to 999, not volunteers.","Minta atau beri bantuan. Penyelamatan melalui 999, bukan sukarelawan.","求助或提供帮助。救援请找999，而非志愿者。"],
+["I want to","Saya ingin","我想"],["Ask for help","Minta bantuan","求助"],["Offer help","Beri bantuan","提供帮助"],["What","Apa","需要什么"],["Food","Makanan","食物"],["Drinking water","Air minuman","饮用水"],["Blankets and clothing","Selimut dan pakaian","毯子和衣物"],["Medicine","Ubat","药品"],["Baby supplies","Barang bayi","婴儿用品"],["Transport","Pengangkutan","交通"],["Temporary shelter","Tempat berlindung sementara","临时住所"],["Boat or rescue","Bot atau penyelamatan","船只或救援"],
+["People or quantity","Bilangan orang atau kuantiti","人数或数量"],["Send","Hantar","提交"],["Requests","Permintaan","求助"],["Offers","Tawaran","援助"],["Matched","Dipadankan","已配对"],["Request","Permintaan","求助"],["Offer","Tawaran","援助"],
+["Contact details stay private. Volunteer matching by distance and urgency needs the backend.","Maklumat hubungan kekal peribadi. Padanan sukarelawan mengikut jarak dan kecemasan memerlukan pelayan.","联系方式保密。按距离与紧急程度匹配志愿者需要后端。"],
+["Flood Ready","Siap Siaga Banjir","防洪准备"],
+["1. What is a flash flood?","1. Apakah banjir kilat?","1. 什么是山洪暴发？"],["Heavy rain arrives faster than drains and rivers can carry it. In cities, roads and concrete send water to low ground within minutes. Warning signs: dark clouds, rising drains, muddy fast water.","Hujan lebat tiba lebih cepat daripada kapasiti longkang dan sungai. Di bandar, jalan dan konkrit menyalurkan air ke kawasan rendah dalam beberapa minit. Tanda amaran: awan gelap, longkang meningkat, air berlumpur deras.","暴雨来得比排水沟和河流排水更快。在城市里，路面和水泥地几分钟内就把水引向低洼处。征兆：乌云、排水沟水位上涨、浑浊急流。"],
+["2. Your go-bag","2. Beg kecemasan anda","2. 您的应急包"],["Water, ready food, medicine, torch, power bank, copies of IDs in a waterproof bag, and extra care items for children, elders and anyone with a disability.","Air, makanan sedia dimakan, ubat, lampu suluh, bank kuasa, salinan dokumen dalam beg kalis air, serta keperluan tambahan untuk kanak-kanak, warga emas dan OKU.","水、即食食品、药品、手电筒、充电宝、防水袋装证件复印件，以及儿童、老人和残障者的额外用品。"],
+["3. Evacuation centres","3. Pusat pemindahan","3. 疏散中心"],["Temporary centres open when authorities activate them. Bring IDs, medicine, bedding and snacks. Elders, babies and the disabled are helped first.","Pusat sementara dibuka apabila pihak berkuasa mengaktifkannya. Bawa dokumen, ubat, alas tidur dan makanan ringan. Warga emas, bayi dan OKU dibantu dahulu.","临时中心在当局启动后开放。请带证件、药品、寝具和零食。老人、婴儿和残障者优先。"],
+["4. Giving help well","4. Memberi bantuan dengan baik","4. 正确地提供帮助"],["Ask what is needed before donating. Coordinate with local groups so one street is not flooded with rice while another has none.","Tanya keperluan sebelum menderma. Selaras dengan kumpulan setempat supaya satu jalan tidak berlebihan beras sementara yang lain kekurangan.","捐赠前先问清需求，并与当地团体协调，避免一条街米太多而另一条街没有。"],
+["5. Check before you share","5. Semak sebelum berkongsi","5. 转发前先核实"],["Look for who posted it, when, and where. Share official sources first. If unsure, do not forward.","Lihat siapa yang menyiarkan, bila dan di mana. Kongsi sumber rasmi dahulu. Jika ragu, jangan hantar.","看清谁发的、何时、何地。优先分享官方来源。不确定就不要转发。"],
+["Flood intelligence","Perisikan banjir","洪水监测"],["Official data stays official. Live rainfall and river levels need server access and credentials, so nothing here is made up. Open the source directly:","Data rasmi kekal rasmi. Hujan dan paras sungai langsung memerlukan akses pelayan dan kelayakan, jadi tiada data rekaan di sini. Buka sumber terus:","官方数据以官方为准。实时雨量和河流水位需要服务器权限和凭证，因此这里没有任何编造数据。请直接打开来源："],
+["Weather and rainfall warnings","Amaran cuaca dan hujan","天气与降雨警告"],["River levels and rainfall stations","Paras sungai dan stesen hujan","河流水位与雨量站"],["National disaster updates","Kemas kini bencana kebangsaan","国家灾难最新消息"],["Welfare and relief centres","Kebajikan dan pusat bantuan","福利与救济中心"],
+["An independent community project, not endorsed by NADMA, JKM or any agency. Sample reports are labelled DEMO. Reports and relief posts disappear after 48 hours.","Projek komuniti bebas, tidak disokong oleh NADMA, JKM atau mana-mana agensi. Laporan contoh berlabel DEMO. Laporan dan hantaran bantuan hilang selepas 48 jam.","独立的社区项目，未获NADMA、JKM或任何机构背书。示例报告标有DEMO。报告和救援信息将在48小时后消失。"],
+["Storage full. Photo not saved.","Storan penuh. Foto tidak disimpan.","存储已满，照片未保存。"],["You already amplified this report.","Anda sudah menguatkan laporan ini.","您已扩散过此报告。"],["Thank you. Your confirmation is added.","Terima kasih. Pengesahan anda ditambah.","谢谢，您的确认已添加。"],["Please wait 30 seconds between reports.","Sila tunggu 30 saat antara laporan.","两次报告之间请等待30秒。"],["Sent. If anyone is in danger, call 999 now.","Dihantar. Jika ada yang dalam bahaya, hubungi 999 sekarang.","已提交。如有人身处危险，请立即拨打999。"],["Report sent","Laporan dihantar","报告已提交"],["Rescue is for 999. Please call now. Your note is saved too.","Penyelamatan melalui 999. Sila hubungi sekarang. Nota anda turut disimpan.","救援请联系999，请立即拨打。您的记录已保存。"],["Saved. A coordinator will follow up once the backend is live.","Disimpan. Penyelaras akan menghubungi apabila pelayan aktif.","已保存。后端上线后协调员会跟进。"]];
+let lang="en",L0="en";try{L0=localStorage.getItem("arusL")||"en"}catch(e){}if(!["en","ms","zh"].includes(L0))L0="en";
+const DICT={ms:{},zh:{}};TR.forEach(([e,m,z])=>{DICT.ms[e]=m;DICT.zh[e]=z});
+const tx=s=>lang!="en"&&DICT[lang][s]||s,O=new WeakMap();
+function tr(r=document.body){const w=document.createTreeWalker(r,4);let n;while(n=w.nextNode()){if(/^(SCRIPT|STYLE)$/.test(n.parentNode.tagName))continue;if(!O.has(n))O.set(n,n.nodeValue);const o=O.get(n),k=o.trim(),v=lang!="en"&&DICT[lang][k];n.nodeValue=v?o.replace(k,()=>v):o}
+r.querySelectorAll("[placeholder],[aria-label]").forEach(e=>{e._o=e._o||{};["placeholder","aria-label"].forEach(a=>{if(!e.hasAttribute(a))return;if(!(a in e._o))e._o[a]=e.getAttribute(a);e.setAttribute(a,lang!="en"&&DICT[lang][e._o[a]]||e._o[a])})})}
+{const f=feed,d=dist,r=relief;feed=()=>{sync();f();tr($("#feed"));fit()};dist=()=>{sync();d();tr($("#dg"))};relief=()=>{sync();r();tr($("#hl"))}}
+const V={r:[],h:[]},RAW={r:[],a:[],h:[]},H48=48*36e5;let DBH=null;
+function sync(){const now=Date.now(),src=DBH?RAW:{r:S.r,a:S.amp,h:S.h};
+V.r=src.r.filter(x=>now-x.ts<H48).map(r=>{const A=src.a.filter(a=>a.rid==r.id).sort((a,b)=>a.ts-b.ts);return{...r,c:(r.c||1)+A.length,u:[...(r.u||[]),...A]}});
+V.h=src.h.filter(x=>now-x.ts<H48).sort((a,b)=>(a.resolved?1:0)-(b.resolved?1:0)||b.ts-a.ts)}
+async function put(col,o){if(DBH){try{await DBH.doc(col+"/"+o.id).set(o)}catch(e){toast("Could not save. You may need Contributor access.");return false}}else{(col=="reports"?S.r:col=="helps"?S.h:S.amp).push(o);save()}return true}
+const gone=new Set();function purge(col,a){a.forEach(x=>{if(Date.now()-x.ts>=H48&&!gone.has(x.id)){gone.add(x.id);DBH.doc(col+"/"+x.id).delete().catch(()=>{})}})}
+async function initDB(){try{DBH=await claude.use("db")}catch(e){}if(!DBH)return;
+const sub=(col,k)=>DBH.collection(col).onSnapshot(sn=>{RAW[k]=sn.docs.map(d=>d.data());purge(col,RAW[k]);feed();dist();relief()},()=>{});
+sub("reports","r");sub("amps","a");sub("helps","h");$("#mn").textContent="Shared database connected. Reports disappear after 48 hours.";tr($("#mn"))}
+(function w(n){if(window.claude&&claude.use)initDB();else if(n<20)setTimeout(()=>w(n+1),300)})(0);
+setInterval(()=>{feed();dist();relief()},6e4);
+const IDS=["home","alerts","report","hz","relief","ready","intel"];
+let S;try{S=JSON.parse(localStorage.getItem("arus1"))}catch(e){}
+S=S||{r:[{id:"ARUS-DEMO1",d:"Petaling",a:"Sample area A",lv:2,rd:"Difficult",t:"DEMO: water rising near the drain.",ts:Date.now()-36e5,c:1,u:[],demo:1},{id:"ARUS-DEMO2",d:"Klang",a:"Sample area B",lv:1,rd:"Passable",t:"DEMO: ankle-deep water, roads open.",ts:Date.now()-72e5,c:3,u:[{x:"Stable",ts:Date.now()-5e6}],demo:1}],h:[],my:{}};
+S.amp=S.amp||[];S.my=S.my||{};
+const save=()=>{try{localStorage.setItem("arus1",JSON.stringify(S))}catch(e){toast("Storage full. Photo not saved.")}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=t=>new Date(t).toLocaleString({en:"en-MY",ms:"ms-MY",zh:"zh-CN"}[lang],{dateStyle:"medium",timeStyle:"short"});
+function toast(m){const t=$("#toast");t.textContent=tx(m);t.classList.add("s");clearTimeout(toast.i);toast.i=setTimeout(()=>t.classList.remove("s"),3200)}
+/* intro */
+const cs=56,cols=Math.ceil(innerWidth/cs),rows=Math.ceil(innerHeight/cs),g=$("#grid");g.style.gridTemplate=`repeat(${rows},1fr)/repeat(${cols},1fr)`;
+g.innerHTML=Array.from({length:cols*rows},()=>`<i style="transition-delay:${Math.random()*900|0}ms"></i>`).join("");
+const word=el=>{el.innerHTML=[..."ARUS"].map((c,i)=>`<span style="animation-delay:${i*120}ms">${c}</span>`).join("")};
+word($(".it"));word($("#home h1"));
+setTimeout(()=>{$("#intro").classList.add("go");document.body.classList.add("on")},2100);setTimeout(()=>$("#intro").remove(),3400);
+/* nav */
+const nav=$("#nav .in");
+const links=IDS.map((id,i)=>{const a=document.createElement("a");a.href="#"+id;a.dataset.go=id;nav.appendChild(a);return a});
+function setLang(l){lang=l;try{localStorage.setItem("arusL",l)}catch(e){}$$(".lang button").forEach(b=>b.classList.toggle("a",b.dataset.l==l));links.forEach((a,i)=>{if(!a.textContent)a.textContent=NAV[i]});document.documentElement.lang=l=="zh"?"zh-Hans":l;document.title=tx("ARUS – Selangor & Kuala Lumpur Flood Alert");feed();dist();relief();tr(document.body);mv(cur,1)}
+$$(".lang button").forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+let cur=0;
+function mv(i,s){cur=i;const a=links[i],b=$(".blob"),d=$(".drop");b.style.left=a.offsetLeft+"px";b.style.width=a.offsetWidth+"px";d.style.left=a.offsetLeft+"px";d.style.width=a.offsetWidth+"px";if(!s)a.scrollIntoView({inline:"center",block:"nearest"})}
+function pos(el){let y=0;for(let s=el.previousElementSibling;s;s=s.previousElementSibling)y+=s.offsetHeight;return y}
+document.addEventListener("click",e=>{const a=e.target.closest("[data-go]");if(!a)return;e.preventDefault();scrollTo({top:pos($("#"+a.dataset.go)),behavior:"smooth"})});
+/* layout: stacking + horizontal */
+const trk=$("#trk"),hz=$("#hz");
+function fit(){hz.style.height=trk.scrollWidth-innerWidth+innerHeight+"px";$$(".stk").forEach(s=>s.style.top=Math.min(0,innerHeight-s.offsetHeight)+"px");onS()}
+function onS(){const y=scrollY,m=document.documentElement.scrollHeight-innerHeight;document.documentElement.style.setProperty("--sy",y);$("#gauge b").style.height=(m>0?y/m*100:0)+"%";
+const hp=Math.min(1,Math.max(0,(y-pos(hz))/(hz.offsetHeight-innerHeight)));trk.style.transform=`translateX(${-hp*(trk.scrollWidth-innerWidth)}px)`;
+let k=0;IDS.forEach((id,i)=>{if(pos($("#"+id))<=y+innerHeight*.4)k=i});if(k!==cur)mv(k)}
+addEventListener("scroll",onS,{passive:true});addEventListener("resize",()=>{fit();mv(cur,1)});
+/* selects */
+const opt=a=>a.map(x=>`<option>${x}</option>`).join("");
+$("#rd").innerHTML=grp();$("#hd").innerHTML=grp();$("#ff").innerHTML="<option value=''>All districts</option>"+grp();
+$("#ff").onchange=feed;
+$("#state").onchange=dist;
+/* alerts */
+const lvl=d=>{const r=V.r.filter(x=>x.d==d&&!x.demo&&!x.done);if(!r.length)return 0;const m=Math.max(...r.map(x=>x.str?3:x.lv));return m}
+const LN=["GREEN · Normal","YELLOW · Watch","ORANGE · Flooding reported","RED · Severe"],ACT=["No reports on this device.","Watch rainfall and drains.","Be ready to move. Avoid low roads.","Move to safety. Call 999 if trapped."];
+function dist(){const sv=$("#state").value,list=ST[sv];$("#dg").innerHTML=(HINT[sv]?'<p class="note" style="grid-column:1/-1;margin:0">'+HINT[sv]+"</p>":"")+list.map(d=>{const l=lvl(d);return`<button class="card dist" data-d="${d}"><h3>${d}</h3><span class="chip L${l}">${LN[l]}</span><p style="margin:10px 0 0">${ACT[l]}</p></button>`}).join("")}
+$("#dg").onclick=e=>{const b=e.target.closest("[data-d]");if(!b)return;$("#ff").value=b.dataset.d;feed();scrollTo({top:pos($("#report")),behavior:"smooth"})};
+/* feed */
+function feed(){const f=$("#ff").value,r=V.r.filter(x=>!f||x.d==f).sort((a,b)=>b.ts-a.ts);
+$("#feed").innerHTML=r.length?r.map(x=>`<article class="card rep"><b>${esc(x.a)}, ${x.d}${SD[x.d]&&SD[x.d]!=x.d?", "+SD[x.d]:""}</b>${x.demo?'<span class="demo">DEMO</span>':""}<br><span class="chip L${x.str?3:x.lv}">${["","Ankle-deep","Knee-deep","Waist-deep+"][x.lv]}</span>${x.str?' <span class="chip L3">Stranded</span>':""} <span class="chip">${x.c>=3?"Community Confirmed":"Newly Reported"}</span>
+<small>${x.id} · ${fmt(x.ts)} · <span>Road</span>: <span>${x.rd}</span> · ${x.c} <span>confirmations</span> (<span>not an official alert</span>)</small><p>${esc(x.t||"")}</p>${x.img?`<img src="${x.img}" alt="Reported flood" style="max-width:100%;border-radius:12px">`:""}
+${x.u.map(u=>`<div class="upd">${fmt(u.ts)}: <span>Water ${u.x.toLowerCase()}</span></div>`).join("")}
+<div class="row"><select aria-label="Water trend" id="t-${x.id}"><option value="Rising">Rising</option><option value="Stable">Stable</option><option value="Decreasing">Decreasing</option></select><button class="btn" data-am="${x.id}">AMPLIFY FLOOD ALERT</button></div></article>`).join(""):'<p class="card">No reports here yet. Be the first to report.</p>';fit()}
+$("#feed").onclick=async e=>{const id=e.target.dataset.am;if(!id)return;if(S.my[id])return toast("You already amplified this report.");S.my[id]=1;const a={id:"A"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),rid:id,x:$("#t-"+id).value,ts:Date.now()};if(!await put("amps",a)){delete S.my[id];return}save();feed();dist();toast("Thank you. Your confirmation is added.")};
+/* report submit */
+let last=0;
+$("#rf").onsubmit=async e=>{e.preventDefault();if(Date.now()-last<30000)return toast("Please wait 30 seconds between reports.");last=Date.now();
+const lv=+$("#rl").value,r={id:"ARUS-"+Date.now().toString(36).toUpperCase(),d:$("#rd").value,a:$("#ra").value.trim(),lv,rd:$("#rr").value,t:$("#rt").value.trim(),ts:Date.now(),c:1,u:[],str:$("#rs").checked};
+const f=$("#rp").files[0];if(f){try{r.img=await shrink(f)}catch(x){}}
+if(!await put("reports",r))return;e.target.reset();$("#ff").value="";feed();dist();toast(r.str?"Sent. If anyone is in danger, call 999 now.":tx("Report sent")+": "+r.id)};
+function shrink(f){return new Promise((ok,no)=>{const i=new Image();i.onload=()=>{const k=Math.min(1,480/i.width),c=document.createElement("canvas");c.width=i.width*k;c.height=i.height*k;c.getContext("2d").drawImage(i,0,0,c.width,c.height);ok(c.toDataURL("image/jpeg",.6))};i.onerror=no;i.src=URL.createObjectURL(f)})}
+/* relief */
+function relief(){const o=V.h.filter(x=>!x.resolved),q=o.filter(x=>x.k=="Request"),f=o.filter(x=>x.k=="Offer");$("#s1").textContent=q.length;$("#s2").textContent=f.length;
+$("#s3").textContent=q.filter(x=>f.some(y=>y.c==x.c&&y.d==x.d)).length;$("#s4").textContent=V.h.filter(x=>x.resolved).length;
+$("#hl").innerHTML=V.h.slice(0,40).map(x=>`<div class="card hc${x.resolved?" done":""}" style="margin-bottom:14px;padding:16px"><span class="chip">${x.k}</span> ${x.resolved?'<span class="chip L0">Resolved</span>':""} <b>${esc(x.c)}</b> · ${esc(x.d)} · ${esc(x.n)}<br>${x.m?esc(x.m)+"<br>":""}<a class="btn alt" style="min-height:52px;margin:8px 0" href="tel:${esc(String(x.p).replace(/[^+0-9]/g,""))}">📞 ${esc(x.p)}</a><small class="note" style="display:block"><span>Posted</span> ${fmt(x.ts)} · <span>Expires</span> ${fmt(x.ts+H48)}</small>${x.resolved?"":'<button class="btn" style="margin-top:8px" data-rs="'+x.id+'">Mark as resolved</button>'}</div>`).join("");fit()}
+$("#hf").onsubmit=async e=>{e.preventDefault();const p=$("#hp").value.trim();if(!/^\+?[0-9][0-9\s-]{7,15}$/.test(p))return toast("Please enter a valid phone number.");const c=$("#hc").value,h={id:"H"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),k:$("#hk").value,c,d:$("#hd").value,n:$("#hn").value,p,m:$("#hm").value.trim(),ts:Date.now(),resolved:false};if(!await put("helps",h))return;e.target.reset();relief();toast(c.includes("rescue")?"Rescue is for 999. Please call now. Your note is saved too.":"Saved. Others can now see your number and call you.")};
+$("#hl").onclick=async e=>{const id=e.target.dataset.rs;if(!id)return;const h=V.h.find(x=>x.id==id);if(!h)return;const n={...h,resolved:true,rts:Date.now()};if(DBH){try{await DBH.doc("helps/"+id).set(n)}catch(x){return toast("Could not save. You may need Contributor access.")}}else{Object.assign(S.h.find(x=>x.id==id)||{},n);save();relief()}toast("Marked as resolved. Thank you.")};
+/* checklist */
+$$("[data-dl]").forEach(b=>b.onclick=()=>{const t="ARUS FLOOD GO-BAG CHECKLIST\n[ ] Drinking water\n[ ] Ready-to-eat food\n[ ] Medicine and first aid\n[ ] Torch, batteries, power bank\n[ ] IDs in a waterproof bag\n[ ] Phone numbers written on paper\n[ ] Clothes, blankets\n[ ] Items for babies, elders, disabled family\nEmergency: 999\n",a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain"}));a.download="arus-checklist.txt";a.click()});
+setLang(L0);
+addEventListener("load",()=>{fit();mv(0,1)});document.fonts&&document.fonts.ready.then(()=>{fit();mv(cur,1)});
+</script></body></html>
